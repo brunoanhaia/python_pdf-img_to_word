@@ -1,0 +1,6 @@
+**.pdf
+**.jpg
+**.ppm
+/venv/**
+.idea
+.vscode
