@@ -19,13 +19,20 @@ def main():
     create_docx(output_dir)
 
 
-def create_docx(output_dir):
+def create_img_docx(source_dir):
     document = Document()
-    file_list = os.listdir(output_dir)
+    file_list = os.listdir(source_dir)
     for file in file_list:
-        document.add_picture(os.path.join(output_dir, file), width=Cm(16), height=Cm(21))
+        document.add_picture(os.path.join(source_dir, file), width=Cm(15))
         document.add_page_break()
 
+    print(len(document.sections))
+    sections = document.sections
+    for section in sections:
+        section.top_margin = Cm(3)
+        section.bottom_margin = Cm(2)
+        section.left_margin = Cm(3)
+        section.right_margin = Cm(2)
     document.save('output.docx')
 
 
@@ -67,11 +74,6 @@ def save_page(output_dir, base_filename, page):
                                 str(count) + '.jpg')
     print(img_filename)
     page.save(img_filename, 'JPEG')
-
-
-def get_folder_file_count(folder):
-    dir_files = os.listdir(folder)
-    return len(dir_files)
 
 
 if __name__ == '__main__':
