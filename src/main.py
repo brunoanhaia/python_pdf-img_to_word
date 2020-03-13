@@ -1,5 +1,7 @@
 import os
 from pdf2image import convert_from_path
+from docx import Document
+from docx.shared import Cm
 
 
 def main():
@@ -13,6 +15,18 @@ def main():
 
     for file in input_files:
         convert_file_to_pdf(file, temp_dir, input_dir, output_dir)
+
+    create_docx(output_dir)
+
+
+def create_docx(output_dir):
+    document = Document()
+    file_list = os.listdir(output_dir)
+    for file in file_list:
+        document.add_picture(os.path.join(output_dir, file), width=Cm(16), height=Cm(21))
+        document.add_page_break()
+
+    document.save('output.docx')
 
 
 def create_dirs(temp_dir, input_dir, output_dir):
