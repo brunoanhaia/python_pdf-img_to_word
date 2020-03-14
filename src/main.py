@@ -13,27 +13,28 @@ def main():
     create_dirs(temp_dir, input_dir, output_dir)
     input_files = os.listdir(input_dir)
 
+    temp_files = []
+
     for file in input_files:
-        convert_file_to_pdf(file, temp_dir, input_dir, output_dir)
+        temp_files += pdf_to_img(file, temp_dir, input_dir, output_dir)
 
-    create_docx(output_dir)
+    create_img_docx(temp_files, output_dir)
 
 
-def create_img_docx(source_dir):
+def create_img_docx(file_list, output_dir):
     document = Document()
-    file_list = os.listdir(source_dir)
+
     for file in file_list:
-        document.add_picture(os.path.join(source_dir, file), width=Cm(15))
+        document.add_picture(file, width=Cm(15))
         document.add_page_break()
 
-    print(len(document.sections))
-    sections = document.sections
-    for section in sections:
+    for section in document.sections:
         section.top_margin = Cm(3)
         section.bottom_margin = Cm(2)
         section.left_margin = Cm(3)
         section.right_margin = Cm(2)
-    document.save('output.docx')
+
+    document.save(output_dir + '\\output.docx')
 
 
 def create_dirs(temp_dir, input_dir, output_dir):
@@ -51,29 +52,24 @@ def create_dirs(temp_dir, input_dir, output_dir):
     if not os.path.isdir(input_dir):
         os.mkdir(input_dir)
 
-    if not os.path.isdir(output_dir):
-        os.mkdir(output_dir)
 
-
-def convert_file_to_pdf(input_file, temp_dir, input_dir, output_dir):
+def pdf_to_img(input_file, temp_dir, input_dir, output_dir):
     input_file = os.path.join(input_dir, input_file)
-    pil_images = convert_from_path(input_file, output_folder=temp_dir)
-    base_filename = os.path.splitext(os.path.basename(input_file))[0]
+    images_path = convert_from_path(input_file, output_folder=temp_dir, fmt='png', paths_only=True)
 
-    for page in pil_images:
-        save_page(output_dir, base_filename, page)
+    return images_path
 
 
-def save_page(output_dir, base_filename, page):
+# TODO: Create function to avoid output file replacement
+def check_existing_files(input_dir, base_filename):
     count = 0
-    while os.path.isfile(os.path.join(output_dir, base_filename + '_' + str(
+    while os.path.isfile(os.path.join(input_dir, base_filename + '_' + str(
             count) + '.jpg')):
         count += 1
 
-    img_filename = os.path.join(output_dir, base_filename + '_' +
+    img_filename = os.path.join(input_dir, base_filename + '_' +
                                 str(count) + '.jpg')
     print(img_filename)
-    page.save(img_filename, 'JPEG')
 
 
 if __name__ == '__main__':
